@@ -12,7 +12,7 @@ importers:
         specifier: ^1.16.4
         version: 1.17.0
       axios:
-        specifier: ^1.2.1
+        specifier: ^1.10.0
         version: 1.10.0
       pinia:
         specifier: ^3.0.1
