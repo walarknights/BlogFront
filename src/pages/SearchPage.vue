@@ -26,7 +26,7 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import api from 'src/utils/axios'
 import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

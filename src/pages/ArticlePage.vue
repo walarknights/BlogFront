@@ -138,7 +138,7 @@ const addFocus = async (focusedUserId) => {
 
 onMounted(async () => {
   try {
-    const id = route.params.id
+    const id = route.params.id as string
     const res = await api.get(`/article/${id}`)
     if (res.data) {
       article.value = res.data

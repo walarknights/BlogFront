@@ -73,7 +73,7 @@ const router = useRouter()
 const useStore = useUserStore()
 const q = useQuasar()
 const route = useRoute()
-const userId = route.params.userId
+const userId = route.params.userId as string
 const focusList = ref()
 // 用对象存储每个用户的关注状态
 const isFocusMap = ref({})

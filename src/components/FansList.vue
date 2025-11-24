@@ -67,7 +67,7 @@ import { useQuasar } from 'quasar'
 import api from 'src/utils/axios'
 const useStore = useUserStore()
 const route = useRoute()
-const userId = route.params.userId
+const userId = route.params.userId as string
 const focusList = ref()
 const message = ref()
 const q = useQuasar()

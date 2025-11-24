@@ -26,7 +26,7 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
-const userId = route.params.userId
+const userId = route.params.userId as string
 
 const data = ref({
   articles: [],

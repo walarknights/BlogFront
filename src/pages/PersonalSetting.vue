@@ -43,7 +43,7 @@
   </q-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from 'src/utils/axios'
@@ -52,8 +52,7 @@ import { useQuasar } from 'quasar'
 const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
-
-const userId = parseInt(route.params.userId)
+const userId = parseInt(String(route.params.userId))
 const avatarFile = ref(null)
 
 const defaultAvatar = 'https://cdn.quasar.dev/img/avatar.png'
@@ -90,7 +89,7 @@ function onAvatarChange(files) {
     avatarFile.value = files[0]
     const reader = new FileReader()
     reader.onload = (e) => {
-      form.value.avatar = e.target.result
+      form.value.avatar = String(e.target.result)
     }
     reader.readAsDataURL(files[0])
   }
