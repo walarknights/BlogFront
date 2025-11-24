@@ -1,0 +1,7 @@
+{
+    "name": "s-des-demo",
+    "compatibility_date": "2025-08-10",
+    "assets": {
+        "directory": "./dist/spa"
+    }
+}
