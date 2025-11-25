@@ -50,7 +50,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import api from 'src/utils/axios'
@@ -65,7 +65,7 @@ const useStore = useUserStore()
 const isLoggedIn = useStore.isLoggedIn // 修正此处
 const route = useRoute()
 const userId = computed(() => useStore.userId)
-const articleId = parseInt(route.params.id, 10)
+const articleId = parseInt(String(route.params.id), 10)
 const albFocus = ref()
 const errorMsg = ref('')
 const isFavorite = ref(false)
@@ -77,8 +77,8 @@ const article = ref({
   title: '',
   type: null,
   abstract: '',
-  likes: '',
-  favorites: '',
+  likes: 0,
+  favorites: 0,
   link: '',
   cover: '',
   author: {
@@ -138,7 +138,7 @@ const addFocus = async (focusedUserId) => {
 
 onMounted(async () => {
   try {
-    const id = route.params.id as string
+    const id = route.params.id
     const res = await api.get(`/article/${id}`)
     if (res.data) {
       article.value = res.data

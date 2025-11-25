@@ -58,7 +58,7 @@
   <p v-if="isNull" style="text-align: center">暂无粉丝</p>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from 'src/stores/useStore'
@@ -67,7 +67,7 @@ import { useQuasar } from 'quasar'
 import api from 'src/utils/axios'
 const useStore = useUserStore()
 const route = useRoute()
-const userId = route.params.userId as string
+const userId = String(route.params.userId)
 const focusList = ref()
 const message = ref()
 const q = useQuasar()

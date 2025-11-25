@@ -62,7 +62,7 @@
   <p v-if="isNull" style="text-align: center">暂无关注</p>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import api from 'src/utils/axios'
@@ -73,7 +73,7 @@ const router = useRouter()
 const useStore = useUserStore()
 const q = useQuasar()
 const route = useRoute()
-const userId = route.params.userId as string
+const userId = route.params.userId
 const focusList = ref()
 // 用对象存储每个用户的关注状态
 const isFocusMap = ref({})

@@ -19,13 +19,13 @@
     <p class="text-h3">暂无文章</p>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import api from 'src/utils/axios'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
-const userId = route.params.userId as string
+const userId = route.params.userId
 
 const data = ref({
   articles: [],
