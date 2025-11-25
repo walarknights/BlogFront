@@ -1,5 +1,5 @@
 {
-    "name": "s-des-demo",
+    "name": "blog",
     "compatibility_date": "2025-08-10",
     "assets": {
         "directory": "./dist/spa"
