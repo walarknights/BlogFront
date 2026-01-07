@@ -10,7 +10,7 @@
         <q-item v-if="!isNull" :clickable="false" class="row" style="padding: 0%">
           <q-item-section avatar>
             <q-avatar text-color="white">
-              <img :src="'http://localhost:8010' + focus.avatar" alt="..." />
+              <img :src="focus.avatar" alt="..." />
             </q-avatar>
           </q-item-section>
 
@@ -21,7 +21,7 @@
           <q-item-section side>
             <!-- 针对每个用户单独维护关注状态 -->
             <q-btn
-              v-if="focus.isFocus"
+              v-if="focus.isFollow"
               @click="cancelFocus(focus.userId)"
               icon="sym_o_menu"
               class="text-white"
@@ -67,7 +67,7 @@ import { useQuasar } from 'quasar'
 import api from 'src/utils/axios'
 const useStore = useUserStore()
 const route = useRoute()
-const userId = String(route.params.userId)
+const userId = route.params.userId as string
 const focusList = ref()
 const message = ref()
 const q = useQuasar()
@@ -76,16 +76,16 @@ const q = useQuasar()
 const isNull = ref(false)
 const cancelFocus = async (focusedUserId) => {
   try {
-    if (useStore.isLoggedIn) {
-      const response = await api.post(`/personal/${userId}/removeFocus`, {
-        FocusId: useStore.userId,
-        FocusedId: focusedUserId,
+    if (useStore.isLogIn) {
+      const response = await api.post(`/personal/removeFollow/${userId}`, {
+        follower: useStore.userId,
+        followee: focusedUserId,
       })
       if (response) {
         message.value = response.data.message
         // 只修改当前用户的关注状态
         const user = focusList.value.find((item) => item.userId === focusedUserId)
-        if (user) user.isFocus = false
+        if (user) user.isFollow = response.data.isFollow ? false : response.data.isFollow
         q.notify({
           message: '取消成功',
           color: 'primary',
@@ -104,23 +104,21 @@ const cancelFocus = async (focusedUserId) => {
 
 const addFocus = async (focusedUserId) => {
   try {
-    if (useStore.isLoggedIn) {
-      const response = await api.post(`/personal/${userId}/addFocus`, {
-        FocusId: useStore.userId,
-        FocusedId: focusedUserId,
+    if (useStore.isLogIn) {
+      const response = await api.post(`/personal/addFollow/${userId}`, {
+        follower: useStore.userId,
+        followee: focusedUserId,
       })
       if (response) {
         console.log(response)
         message.value = response.data.message
+        const user = focusList.value.find((item) => item.userId === focusedUserId)
+        if (user) user.isFollow = response.data.isFollow ? true : response.data.isFollow
         q.notify({
           message: message.value,
           color: 'primary',
         })
         // 只修改当前用户的关注状态
-        if (response.data.isFocus === 2) {
-          const user = focusList.value.find((item) => item.userId === focusedUserId)
-          if (user) user.isFocus = true
-        }
       }
     } else {
       q.notify({
@@ -135,7 +133,7 @@ const addFocus = async (focusedUserId) => {
 
 const getFansList = async () => {
   try {
-    const response = await api.get(`/personal/${userId}/fansList`)
+    const response = await api.get(`/personal/followerList/${userId}`)
     if (response.data) {
       focusList.value = response.data
       console.log(response.data)

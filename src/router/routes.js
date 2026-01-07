@@ -8,9 +8,10 @@ const routes = [
         path: '/Create',
         component: () => import('src/pages/CreateCenter.vue'),
         name: 'Create',
+        withCredentials: true,
       },
       {
-        path: '/articles/:id',
+        path: '/article/spe/:id',
         component: () => import('src/pages/ArticlePage.vue'),
         name: 'ArticlePage',
       },

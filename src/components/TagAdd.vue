@@ -26,12 +26,15 @@
         ref="coverUploader"
         field-name="file"
         style="max-width: 300px"
-        url="http://localhost:8010/article/saveCover"
-        label="必须上传封面（图片不能超过20MB）"
+        :label="uploaderLabel"
         multiple
         accept=".jpg, image/*"
         max-file-size="20971520"
+        max-files="1"
+        :auto-upload="false"
+        :hide-upload-btn="true"
         @added="onCoverAdded"
+        @removed="onCoverRemoved"
       />
     </div>
     <div class="row flex-center" style="width: 100%; margin-bottom: 2%">
@@ -40,7 +43,7 @@
         filled
         v-model="abstract"
         label="摘要"
-        :dense="dense"
+        :dense="true"
         style="width: 56%"
         :rules="[
           (val) => (val && val.length >= 4) || '摘要不能少于4个字',
@@ -50,17 +53,21 @@
     </div>
     <div class="q-pa-lg row flex-center" style="width: 100">
       <p style="margin: 0%; margin-right: 10%">文章类型</p>
-      <q-option-group v-model="group" :options="articleType" color="primary" inline="" />
+      <q-option-group v-model="group" :options="articleType" color="primary" :inline="false" />
     </div>
     <div v-if="group === 'op2'" class="row flex-center" style="width: 100%; margin-bottom: 2%">
       <p style="margin-right: 4%">转载链接</p>
-      <q-input filled v-model="link" label="转载链接" :dense="dense" style="width: 56%" />
+      <q-input filled v-model="link" label="转载链接" :dense="true" style="width: 56%" />
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, watch, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, watch, onMounted, computed } from 'vue'
+import { useQuasar } from 'quasar'
+
+const $q = useQuasar()
+
 const props = defineProps({
   modelValueTags: Array,
   modelValueType: String,
@@ -73,6 +80,10 @@ const emit = defineEmits([
   'update:link',
   'cover-uploaded',
 ])
+
+const uploaderLabel = computed(() => {
+  return $q.screen.width < 600 ? '上传封面' : '必须上传封面(图片不能超过20MB)'
+})
 
 const model = ref(props.modelValueTags || [])
 const group = ref(props.modelValueType || '')
@@ -149,7 +160,15 @@ watch(abstract, (val) => emit('update:abstract', val))
 watch(link, (val) => emit('update:link', val))
 
 function onCoverAdded(files) {
-  emit('cover-uploaded', files && files.length > 0)
+  if (files.length > 0) {
+    // 修改：传递 true 和文件对象
+    emit('cover-uploaded', true, files[0])
+  }
+}
+
+function onCoverRemoved() {
+  // 新增：移除文件时通知父组件
+  emit('cover-uploaded', false, null)
 }
 
 // 页面初始化时也判断一次
@@ -159,4 +178,14 @@ onMounted(() => {
   }
 })
 </script>
-<style></style>
+<style>
+.q-uploader {
+  width: 15rem;
+}
+
+@media screen and (max-width: 600px) {
+  .q-uploader {
+    width: 5rem;
+  }
+}
+</style>

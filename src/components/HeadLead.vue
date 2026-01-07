@@ -40,13 +40,14 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Menu_avatar from './MenuAvatar.vue'
 import AvatarLogin from './AvatarLogin.vue'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
 const router = useRouter()
+const tab = ref<string>('images')
 
 const toHome = () => {
   router.push({ name: 'HomeM' })

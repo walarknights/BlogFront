@@ -1,20 +1,24 @@
 <template>
   <div class="avatar-container">
     <img
-      :src="'http://localhost:8010' + userStore.avatar"
+      :src="
+        userStore.isLogIn
+          ? userStore.avatar
+          : 'https://ui-avatars.com/api/?name=Guest&background=random'
+      "
       alt="用户头像"
       class="avatar-image"
       @click="toggleLoginDialog"
       style="object-fit: cover"
     />
-    <LoginDialog :show="showLoginDialog" @close="showLoginDialog = false" @transData="setinfor" />
+    <LoginDialog :show="showLoginDialog" @close="showLoginDialog = false" />
 
     <!-- 用户卡片 -->
     <div class="user-card">
       <!-- 用户卡片头部 -->
       <div class="user-card-header">
         <q-avatar size="60px">
-          <img :src="'http://localhost:8010' + userStore.avatar" />
+          <img :src="userStore.avatar" />
         </q-avatar>
         <div class="user-name">{{ username || '未登录' }}</div>
         <!-- 添加未登录提示 -->
@@ -37,7 +41,7 @@
       </div>
 
       <!-- 用户操作按钮 -->
-      <div class="user-actions" v-if="userStore.isLoggedIn">
+      <div class="user-actions" v-if="userStore.isLogIn">
         <!-- 只在登录后显示操作按钮 -->
         <q-btn
           flat
@@ -88,7 +92,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useUserStore } from 'src/stores/useStore'
 import LoginDialog from './LoginDialog.vue'
@@ -113,7 +117,7 @@ const toPersonal = () => {
 }
 
 const toSetting = () => {
-  if (!userStore.isLoggedIn) {
+  if (!userStore.isLogIn) {
     q.notify({
       type: 'warning',
       color: 'red',
@@ -129,14 +133,14 @@ const toSetting = () => {
 }
 
 // 使用 computed 属性，直接从 userStore 获取信息
-const username = computed(() => (userStore.isLoggedIn ? userStore.username || '用户名' : '未登录'))
-const followers = computed(() => (userStore.isLoggedIn ? userStore.followers || 0 : 0))
-const following = computed(() => (userStore.isLoggedIn ? userStore.following || 0 : 0))
-const dynamicNum = computed(() => (userStore.isLoggedIn ? userStore.dynamic || 0 : 0))
+const username = computed(() => (userStore.isLogIn ? userStore.username || '用户名' : '未登录'))
+const followers = computed(() => (userStore.isLogIn ? userStore.followers || 0 : 0))
+const following = computed(() => (userStore.isLogIn ? userStore.following || 0 : 0))
+const dynamicNum = computed(() => (userStore.isLogIn ? userStore.dynamic || 0 : 0))
 
 const toggleLoginDialog = () => {
   // 点击头像时，如果未登录则弹出登录框，如果已登录可以考虑跳转个人主页或不操作
-  if (!userStore.isLoggedIn) {
+  if (!userStore.isLogIn) {
     showLoginDialog.value = true
   } else {
     // 可选：已登录时点击头像的行为，例如跳转到个人主页
@@ -145,7 +149,7 @@ const toggleLoginDialog = () => {
   }
 }
 
-const logout = async () => {
+const logout = () => {
   try {
     // 清除本地存储的 token
     localStorage.removeItem('authToken')

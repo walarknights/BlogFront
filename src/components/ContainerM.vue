@@ -10,10 +10,10 @@
         <div class="q-ma-sm col-4 card-inner" style="height: 80%">
           <img
             :src="
-              article.cover
-                ? article.cover.startsWith('http')
-                  ? article.cover
-                  : 'http://localhost:8010' + article.cover
+              article.coverUrl
+                ? article.coverUrl.startsWith('http')
+                  ? article.coverUrl
+                  : article.coverUrl
                 : 'https://cdn.quasar.dev/img/mountains.jpg'
             "
             class="card-img"
@@ -22,7 +22,7 @@
           />
           <div style="height: 20%; margin-bottom: 2%">
             <div class="text-h6">{{ article.author?.username || '未知用户' }}</div>
-            <div class="text-subtitle2">{{ article.abstract }}</div>
+            <span class="abstract">{{ article.abstract }}</span>
           </div>
         </div>
       </div>
@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from 'src/utils/axios'
@@ -44,6 +44,7 @@ const toArticle = (id) => {
 
 onMounted(async () => {
   // 直接使用后端返回的结构
+
   const res = await api.get('/article/list')
   if (res.data) {
     articles.value = res.data
@@ -94,5 +95,14 @@ onMounted(async () => {
 .article-card:hover .card-img {
   transform: scale(1.04) rotate(-1deg);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.abstract {
+  height: 4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 </style>

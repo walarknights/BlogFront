@@ -12,8 +12,8 @@
   </div>
 </template>
 
-<script setup>
-import { ref, watch, computed, warn } from 'vue'
+<script setup lang="ts">
+import { ref, watch, computed } from 'vue'
 
 import { storeToRefs } from 'pinia'
 import { useUserStore } from 'src/stores/useStore'
@@ -31,6 +31,11 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  parentId: {
+    // 如果是回复评论，则传入被回复评论的ID
+    type: Number,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['comment-posted', 'cancel-reply'])
@@ -46,9 +51,9 @@ const formTitle = computed(() => {
 
 const submitComment = async () => {
   if (!content.value.trim()) return
-  if (!currentUser.isLoggedIn.value) {
+  if (!currentUser.isLogIn.value) {
     q.notify({
-      type: warn,
+      type: 'warn',
       message: '请先登录',
     })
     return true
@@ -63,7 +68,7 @@ const submitComment = async () => {
   }
 
   try {
-    await api.post(`/article/${commentData.articleId}/comments`, commentData)
+    await api.post(`/article/addComment/${commentData.articleId}`, commentData)
     content.value = ''
     emit('comment-posted')
   } catch (error) {

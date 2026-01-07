@@ -4,11 +4,10 @@
     <CasurolAuto v-model:slide="props.slide" :autoplay="props.autoplay" />
     <NewsList />
     <ContainerM />
-    
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import CasurolAuto from 'src/components/CasurolAuto.vue'
 import { reactive } from 'vue'
 import ContainerM from 'src/components/ContainerM.vue'

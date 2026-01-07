@@ -26,11 +26,18 @@
             filled
             v-model="password"
             label="密码"
-            type="password"
+            :type="visible ? 'text' : 'password'"
             placeholder="请输入密码"
             dense
             style="border: 1px solid black"
-          />
+          >
+            <q-btn
+              @click="visible = !visible"
+              :icon="visible ? 'sym_o_visibility' : 'sym_o_visibility_lock'"
+              flat
+              style="position: absolute; right: 0; top: 0"
+            />
+          </q-input>
         </q-card-section>
 
         <q-card-section style="padding-top: 0; padding-bottom: 0; height: 10%">
@@ -93,27 +100,41 @@
           />
         </q-card-section>
 
-        <q-card-section style="width: 80%">
+        <q-card-section style="width: 80%" class="row">
           <q-input
             filled
             v-model="setpassword"
             label="密码"
-            type="password"
+            :type="setpasswordVisible ? 'text' : 'password'"
             placeholder="请输入密码"
             dense
-            style="border: 1px solid black"
-          />
+            style="border: 1px solid black; width: 100%; position: relative"
+          >
+            <q-btn
+              @click="setpasswordVisible = !setpasswordVisible"
+              :icon="setpasswordVisible ? 'sym_o_visibility' : 'sym_o_visibility_lock'"
+              flat
+              style="position: absolute; right: 0; top: 0"
+            />
+          </q-input>
         </q-card-section>
         <q-card-section style="width: 80%">
           <q-input
             filled
             v-model="rpassword"
             label="确认"
-            type="password"
+            :type="rpasswordVisible ? 'text' : 'password'"
             placeholder="请再次输入密码"
             dense
-            style="border: 1px solid black"
-          />
+            style="border: 1px solid black; width: 100%; position: relative"
+          >
+            <q-btn
+              @click="rpasswordVisible = !rpasswordVisible"
+              :icon="rpasswordVisible ? 'sym_o_visibility' : 'sym_o_visibility_lock'"
+              flat
+              style="position: absolute; right: 0; top: 0"
+            />
+          </q-input>
         </q-card-section>
 
         <q-card-section style="padding-top: 0; padding-bottom: 0; height: 10%">
@@ -150,15 +171,15 @@
   </q-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import api from 'src/utils/axios'
 import { useUserStore } from 'src/stores/useStore'
-import { storeToRefs } from 'pinia'
 
 const userStore = useUserStore()
-
-const userId = storeToRefs(userStore)
+const setpasswordVisible = ref(false)
+const rpasswordVisible = ref(false)
+const visible = ref(false)
 const props = defineProps({
   show: Boolean,
 })
@@ -197,7 +218,7 @@ onMounted(async () => {
   const token = localStorage.getItem('authToken')
   if (token) {
     try {
-      const response = await api.post('/api/verify-token', {
+      const response = await api.post('/user/verifyToken', {
         token: token,
       })
 
@@ -235,7 +256,7 @@ const login = async () => {
     isLoading.value = true
     errorMsg.value = ''
 
-    const response = await api.post('/api/login', {
+    const response = await api.post('/user/login', {
       username: username.value,
       password: password.value,
     })
@@ -243,7 +264,8 @@ const login = async () => {
       localStorage.setItem('authToken', response.data.token)
       userStore.setUser(response.data.userResponse)
       emit('transData', response.data.userResponse)
-      console.log(userId.value)
+      console.log(userStore.avatar)
+
       close()
     } else {
       throw new Error('登录响应数据无效')
@@ -270,13 +292,13 @@ const setup = async () => {
     isLoading.value = true
     errorMsg.value = ''
 
-    const response = await api.post('/api/setup', {
-      setusername: setusername.value,
-      setpassword: setpassword.value,
+    const response = await api.post('/user/setUser', {
+      username: setusername.value,
+      password: setpassword.value,
     })
 
     if (response.data) {
-      userStore.setUser(response.data.userResponse)
+      userStore.setUser(response.data.user)
       localStorage.setItem('authToken', response.data.token)
       emit('transData', response.data)
       close()
@@ -311,7 +333,7 @@ const close = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 0;
+  z-index: 1000;
 }
 
 .login-content {

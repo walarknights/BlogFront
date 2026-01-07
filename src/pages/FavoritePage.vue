@@ -26,13 +26,13 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import api from 'src/utils/axios'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
-const userId = route.params.userId
+const userId = route.params.userId as string
 
 const data = ref({
   articles: [],
@@ -42,7 +42,7 @@ const data = ref({
 const getCoverUrl = (idx) => {
   const url = data.value.Url[idx]
   if (!url) return 'https://cdn.quasar.dev/img/mountains.jpg'
-  return url.startsWith('http') ? url : 'http://localhost:8010' + url
+  return url.startsWith('http') ? url : url
 }
 
 const toArticle = (id) => {

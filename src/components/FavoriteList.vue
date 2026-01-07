@@ -7,7 +7,7 @@
       @click="toArticle(article.articleId)"
     >
       <div class="cover-container">
-        <img :src="getCoverUrl(idx)" alt="封面" class="cover-img" />
+        <img :src="article.coverUrl" alt="封面" class="cover-img" />
       </div>
       <div class="article-content">
         <div class="article-title ellipsis">{{ article.title }}</div>
@@ -25,18 +25,12 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
-const userId = route.params.userId
+const userId = route.params.userId as string
 
 const data = ref({
   articles: [],
   Url: [],
 })
-
-const getCoverUrl = (idx) => {
-  const url = data.value.Url[idx]
-  if (!url) return 'https://cdn.quasar.dev/img/mountains.jpg'
-  return url.startsWith('http') ? url : 'http://localhost:8010' + url
-}
 
 const toArticle = (id) => {
   if (id) {
@@ -46,7 +40,7 @@ const toArticle = (id) => {
 
 const getArticleList = async () => {
   try {
-    const response = await api.get(`/personal/${userId}/getFavorites`)
+    const response = await api.get(`/personal/getFavoritesArticles/${userId}`)
     if (response.data) {
       data.value = response.data
     }

@@ -5,15 +5,19 @@
         搜索结果：<span style="color: #1976d2">{{ searchText }}</span>
       </p>
     </div>
-    <div v-if="data.articles && data.articles.length > 0" class="article-list-vertical">
+    <div v-if="data && data.length > 0" class="article-list-vertical">
       <div
-        v-for="(article, idx) in data.articles"
+        v-for="(article, idx) in data"
         :key="article.id || idx"
         class="article-row"
         @click="toArticle(article.id)"
       >
         <div class="cover-container">
-          <img :src="getCoverUrl(article)" alt="封面" class="cover-img" />
+          <img
+            :src="article.coverUrl ? article.coverUrl : 'https://cdn.quasar.dev/img/mountains.jpg'"
+            alt="封面"
+            class="cover-img"
+          />
         </div>
         <div class="article-content">
           <div class="article-title ellipsis">{{ article.title }}</div>
@@ -32,18 +36,15 @@ import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
-
 const searchText = ref(route.query.q || '')
 
-const data = ref({
-  articles: [],
-})
-
-const getCoverUrl = (article) => {
-  const url = article.cover
-  if (!url) return 'https://cdn.quasar.dev/img/mountains.jpg'
-  return url.startsWith('http') ? url : 'http://localhost:8010' + url
+export interface ArticleSimpleInfo {
+  id: number
+  title: string
+  abstract: string
+  coverUrl?: string
 }
+const data = ref<ArticleSimpleInfo[]>([])
 
 const toArticle = (id) => {
   if (id) {
@@ -55,7 +56,7 @@ const getArticleList = async () => {
   try {
     const response = await api.post(`/article/search`, { q: searchText.value })
     if (response.data) {
-      data.value.articles = response.data
+      data.value = response.data
     }
   } catch (error) {
     console.log(error)

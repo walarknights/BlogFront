@@ -28,7 +28,7 @@
                 <div class="column">
                   <q-avatar style="margin: 0; padding: 0; height: 60px">
                     <img
-                      :src="'http://localhost:8010' + userInfo.avatar"
+                      :src="userInfo.avatar"
                       alt="..."
                       style="background-color: black; border: 1px black; height: 80%"
                     />
@@ -70,7 +70,7 @@
     </q-page-container>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { useRoute } from 'vue-router'
 import ShowCompent from 'src/components/ShowCompent.vue'
 import { onMounted, ref, computed } from 'vue'
@@ -79,10 +79,15 @@ import { useUserStore } from 'src/stores/useStore'
 import { useQuasar } from 'quasar'
 const q = useQuasar()
 const route = useRoute()
-const userId = parseInt(route.params.userId)
+const userId = parseInt(route.params.userId as string)
 const albFocus = ref(true)
 const useStore = useUserStore()
 const userInfo = ref({
+  userId: 0,
+  followings: 0,
+  followers: 0,
+  dynamicNum: 0,
+
   username: '',
   avatar: '',
 })
@@ -94,7 +99,7 @@ function myTweak(offset) {
 
 const fetchPersonalPage = async () => {
   try {
-    const response = await api.get(`/personal/${userId}/userInfo`)
+    const response = await api.get(`/personal/getInfo/${userId}`)
     if (response.data) {
       userInfo.value = response.data
     }
@@ -105,7 +110,7 @@ const fetchPersonalPage = async () => {
 
 const formatfocuses = computed(() => {
   if (!userInfo.value) return '0'
-  const followings = userInfo.value.following
+  const followings = userInfo.value.followings
   if (followings >= 10000) {
     return (followings / 10000).toFixed(1) + '万'
   }
@@ -123,19 +128,19 @@ const formatfollowers = computed(() => {
 
 const addFocus = async () => {
   try {
-    if (useStore.isLoggedIn) {
+    if (useStore.isLogIn) {
       const response = await api.post(`/personal/${userId}/addFocus`, {
         FocusId: useStore.userId,
         FocusedId: userInfo.value.userId,
       })
       if (response) {
         albFocus.value = response.data.isFocus
-        if (albFocus.value == 0) {
+        if (albFocus.value == false) {
           q.notify({
             message: '不能关注自己',
             color: 'red',
           })
-        } else if (albFocus.value == 1) {
+        } else if (albFocus.value == true) {
           q.notify({
             message: '已经关注过了',
             color: 'blue-4',

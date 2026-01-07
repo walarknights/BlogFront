@@ -10,6 +10,6 @@
   </q-layout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import HeadLead from 'src/components/HeadLead.vue'
 </script>

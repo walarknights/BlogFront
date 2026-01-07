@@ -7,7 +7,7 @@ export const useUserStore = defineStore('user', {
     followers: 0,
     following: 0,
     dynamic: 0,
-    isLoggedIn: false,
+    isLogIn: false,
     avatar: 'img/default.png',
   }),
   actions: {
@@ -28,7 +28,7 @@ export const useUserStore = defineStore('user', {
       this.username = username
       this.followers = followers
       this.following = following
-      this.isLoggedIn = isLogin
+      this.isLogIn = isLogin
       this.dynamic = dynamicNum
       this.avatar = avatar
     },
@@ -37,12 +37,25 @@ export const useUserStore = defineStore('user', {
       this.username = ''
       this.followers = 0
       this.following = 0
-      this.isLoggedIn = false
+      this.isLogIn = false
       this.dynamic = 0
       this.avatar = 'img/default.png'
     },
     incrementFollowing() {
       this.following++
+    },
+    decrementFollowing() {
+      if (this.following > 0) {
+        this.following--
+      }
+    },
+    incrementFollowers() {
+      this.followers++
+    },
+    decrementFollowers() {
+      if (this.followers > 0) {
+        this.followers--
+      }
     },
   },
 })

@@ -1,7 +1,22 @@
 {
-    "name": "blog",
-    "compatibility_date": "2025-08-10",
-    "assets": {
-        "directory": "./dist/spa"
-    }
+  "name": "blog",
+  "compatibility_date": "2025-08-10",
+  "assets": {
+    "directory": "./dist/spa",
+  },
+  "main": "functions/_worker.ts",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "blog",
+      "database_id": "1aa51dbc-91bd-4d66-9936-601c5e8be474",
+    },
+  ],
+  "vars": {
+    "JWT_SECRET": "walark",
+    "B2_ENDPOINT": "s3.us-west-004.backblazeb2.com",
+    "B2_KEY_ID": "00479735da1ada00000000001",
+    "B2_APPLICATION_KEY": "K004VHtpwuUtdpLsnMTOU2jBb53ruf0",
+    "B2_BUCKET_NAME": "blog-store",
+  },
 }

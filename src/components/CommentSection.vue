@@ -16,7 +16,11 @@
       暂无评论，快来抢沙发吧！
     </div>
 
-    <div v-for="mainComment in mainComments" :key="mainComment.Id" class="main-comment-thread">
+    <div
+      v-for="mainComment in mainComments"
+      :key="mainComment.commentId"
+      class="main-comment-thread"
+    >
       <CommentItem
         :comment="mainComment"
         :reply-active-id="replyActiveId"
@@ -45,16 +49,34 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import CommentItem from './CommentItem.vue'
 import CommentForm from './CommentForm.vue'
 import api from 'src/utils/axios'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-const articleId = parseInt(route.params.id, 10)
+const articleId = parseInt(route.params.id as string, 10)
+interface parentUser {
+  userId: number
+  userName: string
+  userAvatar: string
+}
 
-const allComments = ref([])
+interface comment {
+  commentId: number
+  content: string
+  userId: number
+  userName: string
+  userAvatar: string
+  articleId: number
+  createdAt: string
+  parentId: number | null
+  rootId: number | null
+  parentUser: parentUser | null
+}
+
+const allComments = ref<comment[]>([])
 const loading = ref(true)
 const error = ref(null)
 const commentFormRef = ref(null) // 用于引用表单组件，方便聚焦等操作
@@ -70,8 +92,9 @@ const fetchComments = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await api.get(`/article/${articleId}/comments`)
+    const response = await api.get(`/article/comments/${articleId}`)
     allComments.value = response.data
+    console.log('allComments:', allComments.value)
   } catch (err) {
     console.error('Failed to fetch comments:', err)
     error.value = '加载评论失败，请稍后再试。'
@@ -88,7 +111,7 @@ const mainComments = computed(() => {
   if (!allComments.value) return []
   return allComments.value
     .filter((comment) => comment.rootId === comment.commentId || !comment.rootId) // 主楼评论 rootId 等于自身 id 或为 null
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 按时间倒序
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // 按时间倒序，使用时间戳避免 TS 算术类型错误
 })
 
 // 计算每个主楼下的所有回复（包括回复主楼和回复子楼的）
@@ -117,7 +140,9 @@ const replies = computed(() => {
 
   // 对每个主楼下的回复按时间排序
   Object.keys(groupedReplies).forEach((rootId) => {
-    groupedReplies[rootId].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    groupedReplies[rootId].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    )
   })
 
   return groupedReplies

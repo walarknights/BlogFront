@@ -4,9 +4,9 @@
       <div class="comment-header" style="height: 60%">
         <div class="row" style="align-items: center; gap: 10px; height: 100%; margin-bottom: 10px">
           <img
-            :src="'http://localhost:8010' + comment.userAvatar"
+            :src="comment.userAvatar"
             alt="..."
-            style="border-radius: 50%; height: 30%; width: 10%"
+            style="border-radius: 50%; height: 3rem; width: 3rem; cursor: pointer"
             @click="toPersonal"
           />
           <strong class="user-name">{{ comment.userName }}</strong>
@@ -33,38 +33,36 @@
         style="justify-content: space-around"
       >
         <img
-          :src="'http://localhost:8010' + comment.userAvatar"
+          :src="comment.userAvatar"
           alt="..."
-          style="border-radius: 50%; height: 30%; width: 10%"
+          style="border-radius: 50%; height: 3rem; width: 3rem"
           @click="toPersonal"
         />
         <div class="column" style="width: 80%">
           <q-input
             v-model="content"
             placeholder="输入评论内容..."
-            autofocus="true"
+            :autofocus="true"
             ref="replyInput"
             style="margin-bottom: 8px"
           ></q-input>
-          <q-btn @click="submitComment" icon="sym_o_add" style="width: 20%; margin-left: 80%"
-            >回复</q-btn
-          >
+          <q-btn @click="submitComment" style="width: 20%; margin-left: 80%"> 回复 </q-btn>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, ref, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
+
 import { useUserStore } from 'src/stores/useStore'
 import { useQuasar } from 'quasar'
 import api from 'src/utils/axios'
 const q = useQuasar()
 const userStore = useUserStore()
-const currentUser = storeToRefs(userStore)
+
 const emit = defineEmits(['comment-posted', 'reply-to'])
 const props = defineProps({
   comment: {
@@ -115,7 +113,7 @@ const submitComment = async () => {
     })
     return true
   }
-  if (!currentUser.isLoggedIn.value) {
+  if (!userStore.isLogIn) {
     q.notify({
       type: 'warning',
       message: '请先登录',
@@ -124,15 +122,15 @@ const submitComment = async () => {
   }
   const commentData = {
     articleId: Number(props.articleId),
-    userId: currentUser.userId.value,
-    userName: currentUser.username.value,
-    userAvatar: currentUser.avatar.value,
+    userId: userStore.userId,
+
     content: content.value.trim(),
     parentId: props.replyActiveId ? Number(props.replyActiveId) : null,
   }
-
+  console.log(commentData)
   try {
-    await api.post(`/article/${commentData.articleId}/comments`, commentData)
+    await api.post(`/article/addComment/${commentData.articleId}`, commentData)
+
     content.value = ''
     emit('comment-posted')
   } catch (error) {

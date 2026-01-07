@@ -68,7 +68,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import FocusList from './FocusList.vue'
 import FansList from './FansList.vue'
@@ -77,7 +77,7 @@ import LikeList from './LikeList.vue'
 import FavoriteList from './FavoriteList.vue'
 const tab = ref('article')
 const innerTab = ref('innerarticle')
-const splitterModel = ref('20')
+const splitterModel = ref<number>(20)
 </script>
 <style>
 .vertical-tabs .q-tabs__content {

@@ -48,7 +48,8 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from 'src/utils/axios'
 import { useQuasar } from 'quasar'
-
+import { useUserStore } from 'src/stores/useStore'
+const userStore = useUserStore()
 const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
@@ -66,7 +67,7 @@ const oldPassword = ref('')
 
 onMounted(async () => {
   try {
-    const res = await api.get(`/personal/${userId}/userInfo`)
+    const res = await api.get(`/personal/getInfo/${userId}`)
     console.log(res.data)
 
     if (res.data) {
@@ -83,24 +84,25 @@ onMounted(async () => {
     $q.notify({ type: 'negative', message: error })
   }
 })
-
+// 图片预览
 function onAvatarChange(files) {
   if (files.length > 0) {
     avatarFile.value = files[0]
     const reader = new FileReader()
     reader.onload = (e) => {
-      form.value.avatar = String(e.target.result)
+      form.value.avatar = e.target.result as string
     }
     reader.readAsDataURL(files[0])
   }
 }
 
+//实时头像更换
 const avatarPreview = computed(() => {
   if (form.value.avatar && form.value.avatar.startsWith('data:image')) {
     return form.value.avatar
   }
   if (form.value.avatar) {
-    return 'http://localhost:8010' + form.value.avatar
+    return form.value.avatar
   }
   return defaultAvatar
 })
@@ -110,26 +112,31 @@ async function onSubmit() {
     $q.notify({ type: 'negative', message: '新密码不能和旧密码一样' })
     return
   }
-  let avatarUrl = form.value.avatar
+  const formData = new FormData()
   if (avatarFile.value) {
-    const formData = new FormData()
     formData.append('file', avatarFile.value)
-    const res = await api.post(`/personal/${userId}/avatarSave`, formData)
-    avatarUrl = res.data.url
-    console.log(avatarUrl)
   }
-  const response = await api.put(`/personal/${userId}/setting `, {
-    username: form.value.username,
-    password: form.value.password,
-    avatar: avatarUrl,
+  if (form.value.password && form.value.password !== oldPassword.value) {
+    formData.append('password', form.value.password)
+  }
+  if (form.value.username) {
+    formData.append('username', form.value.username)
+  }
+  const response = await api.post(`/personal/setting/${userId} `, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   })
-  if (response.data) {
+  if (response.data.flag) {
+    userStore.setUser(response.data.data)
     $q.notify({
       type: 'info',
       color: 'primary',
       message: '修改成功',
     })
     router.push({ name: 'HomeM' })
+  } else {
+    $q.notify({ type: 'negative', message: response.data.message || '修改失败' })
   }
 }
 </script>

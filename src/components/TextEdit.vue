@@ -16,8 +16,6 @@
       content-style="height: 90%; overflow-y: auto;"
       v-model="qeditor"
       label="内容"
-      @focus="focused = true"
-      @blur="focused = false"
       :dense="$q.screen.lt.md"
       :toolbar="[
         [
@@ -108,7 +106,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 const props = defineProps({
   modelValueTitle: String,
