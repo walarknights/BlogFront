@@ -35,6 +35,7 @@ import api from 'src/utils/axios'
 import { useQuasar } from 'quasar'
 import { useUserStore } from 'src/stores/useStore'
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
 const title = ref<string>('')
 const content = ref<string>('')
@@ -42,7 +43,7 @@ const type = ref<string>('')
 const link = ref<string>('')
 const abstract = ref<string>('')
 const coverUploaded = ref<boolean>(false)
-const coverFile = ref<File | null>(null)
+const coverFile = ref(null)
 const $q = useQuasar()
 
 const userStore = useUserStore()
@@ -51,7 +52,7 @@ const isLogIn = userStore.isLogIn
 
 const onCoverUploaded = (uploaded: boolean, file?: File) => {
   coverUploaded.value = uploaded
-  coverFile.value = file || null // 保存文件对象
+  coverFile.value = file ?? null // 保存文件对象
 }
 
 const addarticle = async () => {
@@ -122,9 +123,11 @@ const addarticle = async () => {
     coverUploaded.value = false
 
     router.push({ name: 'HomeM' })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('发布文章失败:', error)
-    const errorMsg = error.response?.data?.message || '发布失败，请重试'
+    const errorMsg =
+      (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+      '发布失败,请重试'
     $q.notify({
       type: 'negative',
       message: errorMsg,

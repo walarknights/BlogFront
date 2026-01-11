@@ -168,7 +168,7 @@ onMounted(fetchPersonalPage)
 </script>
 <style>
 .custom-background {
-  background-image: url('/img/EP - Epilogue.png');
+  background-image: url('/img/CreateBac.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

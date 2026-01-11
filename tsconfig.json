@@ -1,0 +1,15 @@
+{
+  "extends": "./.quasar/tsconfig.json",
+  "compilerOptions": {
+    "types": ["@cloudflare/workers-types", "@types/node"],
+    "lib": ["DOM", "ESNext", "DOM.Iterable", "ES2022", "WebWorker"],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "target": "ESNext",
+    "module": "ESNext",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  }
+}
